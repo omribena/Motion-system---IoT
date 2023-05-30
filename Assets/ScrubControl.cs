@@ -4,47 +4,94 @@ using UnityEngine.Video;
 
 public class ScrubControl : MonoBehaviour
 {
+    public OpenFile openfile;
+    public OpenVideo openvideo;
+
     public GameObject stickman;
     public VideoPlayer videoPlayer;
+
     private bool isScrubbing = false;
+
+    Slider slider;
 
     private void Start()
     {
+        openfile = GameObject.Find("OpenFile").GetComponent<OpenFile>();
+        openvideo = GameObject.Find("OpenVideo").GetComponent<OpenVideo>();
+
         stickman = GameObject.Find("Stickman");
-        videoPlayer = GameObject.Find("videoPlayer").GetComponent<VideoPlayer>();      
-        Slider slider = GetComponent<Slider>();
-        slider.onValueChanged.AddListener(Scrub);
+
+        // Create a new slider GameObject
+        GameObject sliderGO = new GameObject("ScrubSlider");
+        sliderGO.transform.SetParent(transform); // Set the ScrubControl script as the parent of the slider
+
+        // Add the necessary components to the slider GameObject
+        slider = sliderGO.AddComponent<Slider>();
+        RectTransform sliderRect = sliderGO.GetComponent<RectTransform>();
+        // Adjust the position of the slider
+        sliderRect.anchorMin = new Vector2(0f, 0f);
+        sliderRect.anchorMax = new Vector2(1f, 0f);
+        sliderRect.pivot = new Vector2(0.5f, 0f);
+        sliderRect.anchoredPosition = new Vector2(0f, 0f); // Set the desired position of the slider
+        sliderRect.localPosition = new Vector3(0f, 0f, 0f);
+
+
+        // Add a handle and fill to the slider
+        GameObject handle = new GameObject("Handle");
+        handle.transform.SetParent(sliderRect);
+        RectTransform handleRect = handle.AddComponent<RectTransform>();
+        Image handleImage = handle.AddComponent<Image>();
+        handleImage.color = Color.white;
+        handleRect.anchorMin = new Vector2(0.5f, 0f);
+        handleRect.anchorMax = new Vector2(0.5f, 0f);
+        handleRect.pivot = new Vector2(0.5f, 0f);
+        handleRect.anchoredPosition = new Vector2(0f, 0f); // Set the desired position of the handle
+
+
+        GameObject fill = new GameObject("Fill");
+        fill.transform.SetParent(sliderRect);
+        RectTransform fillRect = fill.AddComponent<RectTransform>();
+        Image fillImage = fill.AddComponent<Image>();
+        fillImage.color = Color.blue;
+        // Adjust the position of the fill
+        fillRect.anchorMin = new Vector2(0f, 0f);
+        fillRect.anchorMax = new Vector2(0f, 0f);
+        fillRect.pivot = new Vector2(0f, 0f);
+        fillRect.anchoredPosition = new Vector2(0f, 0f);
     }
 
     private void Update()
     {
-        if (!isScrubbing)
+        if (openvideo.videoStarted && openfile.isAnimationStarted && videoPlayer == null)
+        {
+            videoPlayer = openvideo.videoPlayer;
+            slider.minValue = 0f;
+            slider.maxValue = (float)videoPlayer.length; // Set the maximum value to the length of the video
+            slider.wholeNumbers = false; // Allow fractional values for precise scrubbing
+            slider.onValueChanged.AddListener(Scrub);
+        }
+
+        if (videoPlayer != null && !isScrubbing)
         {
             float playheadPosition = GetPlayheadPosition();
-            Slider slider = GetComponent<Slider>();
             slider.value = playheadPosition;
         }
     }
 
-    private void Scrub(float value)
+    public void Scrub(float value)
     {
         float totalTime = GetTotalTime();
         float targetTime = value * totalTime;
 
-        // Scrub animation
-        Animation animation = stickman.GetComponent<Animation>();
-        foreach (AnimationState state in animation)
-        {
-            state.time = targetTime;
-        }
-        animation.Sample();
+        // Update stickman's joint positions based on the target time
+        Stickman stickmanScript = stickman.GetComponent<Stickman>();
+        //stickmanScript.UpdateJointPositions(targetTime);
 
         // Scrub video
         videoPlayer.time = targetTime;
 
         if (!isScrubbing)
         {
-            animation.Play();
             videoPlayer.Play();
             isScrubbing = true;
         }

@@ -29,6 +29,8 @@ public class Stickman : MonoBehaviour
     VideoPlayer videoPlayer;
     bool videoStarted;
 
+    bool play_clicked=false;
+
     private void Start()
     {
         openfile = GameObject.Find("OpenFile").GetComponent<OpenFile>();
@@ -102,6 +104,84 @@ public class Stickman : MonoBehaviour
         }
         
         Application.targetFrameRate = Mathf.RoundToInt(1.0f / 0.0167f);
+
+        //create canvas (this is essential for the buttom gameobject)
+        GameObject canvasGO = new GameObject("Canvas");
+        Canvas canvas = canvasGO.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvasGO.AddComponent<CanvasScaler>();
+        canvasGO.AddComponent<GraphicRaycaster>();
+
+        //create the button and attach to the canvas and choosing its position
+        GameObject buttonGO = new GameObject("Play buttom");
+        buttonGO.transform.SetParent(canvasGO.transform);
+        RectTransform buttonRectTransform = buttonGO.AddComponent<RectTransform>();
+        buttonRectTransform.localPosition = new Vector3(150f,-250f,0f);
+        buttonRectTransform.sizeDelta = new Vector2(70f, 40f);
+
+        //changing the color of the botton
+        Image buttonImage = buttonGO.AddComponent<Image>();
+        buttonImage.color = Color.white; // Set the desired background color
+
+        //ading a text to the button (change the size and the text here)
+        GameObject textGO = new GameObject("Play");
+        textGO.transform.SetParent(buttonRectTransform);
+        TextMeshProUGUI buttonText = textGO.AddComponent<TextMeshProUGUI>();
+        buttonText.text = "Play";
+        buttonText.font = Resources.Load<TMP_FontAsset>("Fonts & Materials/Arial SDF");
+        buttonText.fontStyle = FontStyles.Bold;
+        buttonText.fontWeight = FontWeight.Bold;
+        buttonText.fontSize = 20;
+        buttonText.alignment = TextAlignmentOptions.Center;
+        buttonText.color = Color.black; 
+        RectTransform textRectTransform = textGO.GetComponent<RectTransform>();
+        textRectTransform.sizeDelta = buttonRectTransform.sizeDelta;
+        textRectTransform.localPosition = Vector2.zero;
+
+        //this code attach clicking the buttom to open the panel
+        Button selectCSVButton = buttonGO.AddComponent<Button>();
+        selectCSVButton.onClick.AddListener(playFunction);
+        void playFunction()
+        {
+            videoPlayer.Play();
+            play_clicked=true;
+        }
+
+        //create the button and attach to the canvas and choosing its position
+        GameObject buttonGO1 = new GameObject("Pause button");
+        buttonGO1.transform.SetParent(canvasGO.transform);
+        RectTransform buttonRectTransform1 = buttonGO1.AddComponent<RectTransform>();
+        buttonRectTransform1.localPosition = new Vector3(300f,-250f,0f);
+        buttonRectTransform1.sizeDelta = new Vector2(70f, 40f);
+
+        //changing the color of the botton
+        Image buttonImage1 = buttonGO1.AddComponent<Image>();
+        buttonImage1.color = Color.white; // Set the desired background color
+
+        //ading a text to the button (change the size and the text here)
+        GameObject textGO1 = new GameObject("Pause");
+        textGO1.transform.SetParent(buttonRectTransform1);
+        TextMeshProUGUI buttonText1 = textGO1.AddComponent<TextMeshProUGUI>();
+        buttonText1.text = "Pause";
+        buttonText1.font = Resources.Load<TMP_FontAsset>("Fonts & Materials/Arial SDF");
+        buttonText1.fontStyle = FontStyles.Bold;
+        buttonText1.fontWeight = FontWeight.Bold;
+        buttonText1.fontSize = 20;
+        buttonText1.alignment = TextAlignmentOptions.Center;
+        buttonText1.color = Color.black; 
+        RectTransform textRectTransform1 = textGO1.GetComponent<RectTransform>();
+        textRectTransform1.sizeDelta = buttonRectTransform1.sizeDelta;
+        textRectTransform1.localPosition = Vector2.zero;
+
+        //this code attach clicking the buttom to open the panel
+        Button selectCSVButton1 = buttonGO1.AddComponent<Button>();
+        selectCSVButton1.onClick.AddListener(PauseFunction);
+        void PauseFunction()
+        {
+            videoPlayer.Pause();
+            play_clicked=false;
+        }
+
     }
 
     private float timeElapsed= 0.0f; // track the time elapsed since the animation started
@@ -117,7 +197,7 @@ public class Stickman : MonoBehaviour
         videoPlayer=openvideo.videoPlayer;
         videoStarted=openvideo.videoStarted;
 
-        if (isAnimationStarted==true&&videoStarted==true)
+        if (isAnimationStarted==true&& videoStarted==true && play_clicked==true)
         {
             // update the time elapsed
             timeElapsed += Time.deltaTime;
@@ -146,7 +226,6 @@ public class Stickman : MonoBehaviour
                     balls[jointName].transform.position =new Vector3(x, y, z);
                     
                 }
-                videoPlayer.Play();
                 lineRenderer.SetPosition(0,joints["P_mtp_toes_r"].transform.position);
                 lineRenderer.SetPosition(1, joints["P_subt_calc_r"].transform.position);
                 lineRenderer.SetPosition(2, joints["P_Ankle_tal_r"].transform.position);
@@ -168,5 +247,7 @@ public class Stickman : MonoBehaviour
                 }
             }
         }
+
     }
+
 }
