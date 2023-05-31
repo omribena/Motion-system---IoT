@@ -116,8 +116,10 @@ public class Stickman : MonoBehaviour
         GameObject buttonGO = new GameObject("Play buttom");
         buttonGO.transform.SetParent(canvasGO.transform);
         RectTransform buttonRectTransform = buttonGO.AddComponent<RectTransform>();
-        buttonRectTransform.localPosition = new Vector3(150f,-250f,0f);
-        buttonRectTransform.sizeDelta = new Vector2(70f, 40f);
+        buttonRectTransform.anchorMin = new Vector2(0.5f, 0f);   // Set the anchor point to the bottom center
+        buttonRectTransform.anchorMax = new Vector2(0.5f, 0f);   // Set the anchor point to the bottom center
+        buttonRectTransform.anchoredPosition = new Vector2(-50f, 30f);   // Move the button up by 30 units from the bottom
+        buttonRectTransform.sizeDelta = new Vector2(70f, 40f);   // Set the size of the button       
 
         //changing the color of the botton
         Image buttonImage = buttonGO.AddComponent<Image>();
@@ -143,7 +145,6 @@ public class Stickman : MonoBehaviour
         selectCSVButton.onClick.AddListener(playFunction);
         void playFunction()
         {
-            videoPlayer.Play();
             play_clicked=true;
         }
 
@@ -151,8 +152,10 @@ public class Stickman : MonoBehaviour
         GameObject buttonGO1 = new GameObject("Pause button");
         buttonGO1.transform.SetParent(canvasGO.transform);
         RectTransform buttonRectTransform1 = buttonGO1.AddComponent<RectTransform>();
-        buttonRectTransform1.localPosition = new Vector3(300f,-250f,0f);
-        buttonRectTransform1.sizeDelta = new Vector2(70f, 40f);
+        buttonRectTransform1.anchorMin = new Vector2(0.5f, 0f);   // Set the anchor point to the bottom center
+        buttonRectTransform1.anchorMax = new Vector2(0.5f, 0f);   // Set the anchor point to the bottom center
+        buttonRectTransform1.anchoredPosition = new Vector2(50f, 30f);   // Move the button up by 30 units from the bottom
+        buttonRectTransform1.sizeDelta = new Vector2(70f, 40f);   // Set the size of the button  
 
         //changing the color of the botton
         Image buttonImage1 = buttonGO1.AddComponent<Image>();
@@ -178,8 +181,43 @@ public class Stickman : MonoBehaviour
         selectCSVButton1.onClick.AddListener(PauseFunction);
         void PauseFunction()
         {
-            videoPlayer.Pause();
             play_clicked=false;
+        }
+
+        //create the button and attach to the canvas and choosing its position
+        GameObject buttonGO2 = new GameObject("quit button");
+        buttonGO2.transform.SetParent(canvasGO.transform);
+        RectTransform buttonRectTransform2 = buttonGO2.AddComponent<RectTransform>();
+        buttonRectTransform2.anchorMin = new Vector2(1f, 1f);
+        buttonRectTransform2.anchorMax = new Vector2(1f, 1f);
+        buttonRectTransform2.anchoredPosition = new Vector2(-30f, -20f);
+        buttonRectTransform2.sizeDelta = new Vector2(50f, 30f); 
+
+        //changing the color of the botton
+        Image buttonImage2 = buttonGO2.AddComponent<Image>();
+        buttonImage2.color = Color.white; // Set the desired background color
+
+        //ading a text to the button (change the size and the text here)
+        GameObject textGO2 = new GameObject("Quit");
+        textGO2.transform.SetParent(buttonRectTransform2);
+        TextMeshProUGUI buttonText2 = textGO2.AddComponent<TextMeshProUGUI>();
+        buttonText2.text = "Quit";
+        buttonText2.font = Resources.Load<TMP_FontAsset>("Fonts & Materials/Arial SDF");
+        buttonText2.fontStyle = FontStyles.Bold;
+        buttonText2.fontWeight = FontWeight.Bold;
+        buttonText2.fontSize = 20;
+        buttonText2.alignment = TextAlignmentOptions.Center;
+        buttonText2.color = Color.black; 
+        RectTransform textRectTransform2 = textGO2.GetComponent<RectTransform>();
+        textRectTransform2.sizeDelta = buttonRectTransform2.sizeDelta;
+        textRectTransform2.localPosition = Vector2.zero;
+
+        //this code attach clicking the buttom to open the panel
+        Button selectCSVButton2 = buttonGO2.AddComponent<Button>();
+        selectCSVButton2.onClick.AddListener(QuitFunction);
+        void QuitFunction()
+        {
+           Application.Quit();
         }
 
     }
@@ -226,6 +264,8 @@ public class Stickman : MonoBehaviour
                     balls[jointName].transform.position =new Vector3(x, y, z);
                     
                 }
+                if (!videoPlayer.isPlaying)
+                        videoPlayer.Play();
                 lineRenderer.SetPosition(0,joints["P_mtp_toes_r"].transform.position);
                 lineRenderer.SetPosition(1, joints["P_subt_calc_r"].transform.position);
                 lineRenderer.SetPosition(2, joints["P_Ankle_tal_r"].transform.position);
@@ -240,12 +280,15 @@ public class Stickman : MonoBehaviour
                 lineRenderer.SetPosition(11, joints["P_subt_calc_l"].transform.position);
                 lineRenderer.SetPosition(12, joints["P_mtp_toes_l"].transform.position);
 
-
                 // increment the current index to move to the next line in the CSV file
                 currentIndex++;
 
                 }
             }
+        }
+        if(isAnimationStarted==true&& videoStarted==true && play_clicked==false)
+        {
+             videoPlayer.Pause();
         }
 
     }

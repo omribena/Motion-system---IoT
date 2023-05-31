@@ -30,7 +30,7 @@ public class OpenVideo : MonoBehaviour
         buttonRectTransform.anchorMin = new Vector2(1f, 1f);
         buttonRectTransform.anchorMax = new Vector2(1f, 1f);
         buttonRectTransform.anchoredPosition = new Vector2(-150f, -30f);
-        buttonRectTransform.sizeDelta = new Vector2(100f, 50f);
+        buttonRectTransform.sizeDelta = new Vector2(70f, 40f);
 
         //changing the color of the botton
         Image buttonImage = buttonGO.AddComponent<Image>();
@@ -44,7 +44,7 @@ public class OpenVideo : MonoBehaviour
         buttonText.font = Resources.Load<TMP_FontAsset>("Fonts & Materials/Arial SDF");
         buttonText.fontStyle = FontStyles.Bold;
         buttonText.fontWeight = FontWeight.Bold;
-        buttonText.fontSize = 20;
+        buttonText.fontSize = 18;
         buttonText.alignment = TextAlignmentOptions.Center;
         buttonText.color = Color.black; 
         RectTransform textRectTransform = textGO.GetComponent<RectTransform>();
